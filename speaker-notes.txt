@@ -1,0 +1,160 @@
+Setup
+  Neo4j running in Desktop
+  4 tabs open i Chrome
+    Slides
+    Browser connected to movies database
+    GraphQL playground
+    VS code with shema open
+  GraphQL server running
+    npx github:oskarhane/neo4j-graphql-dev --bolt neo4j://localhost:7687 -u neo4j -p newpassword --db db1 --schema ./schemas/schema.graphql
+  Slides running
+    npm run dev
+
+-1 - Que talk slide
+
+0
+I'm super excited to talk about what a small team has done at Neo4j in
+the past year!
+
+1 - me
+
+2 - What is Neo4j?
++ Interact with the graph
+
+3 - Cypher
+To the left we see Cypher - To the right we see the model for how
+the data is stored
++ Interact again
+
+4 - Tools
+In addition to an IDE (VSCode) we'll be using these tools today.
+
+Browser - We've got a browser team member in the audience today - Eija!
+Client to query and explore the data in Neo4j, using Cypher.
+We'll use it shortly.
+
+GraphQL Playground - Not made by Neo4j. Interact with GraphQL API:s using GraphQL queries.
+
+5 - Why GraphQL?
+
+6 - Hello neo4j-graphql
+A very small team started a little over a year ago with a mission
+to make it easier to put an API in front of Neo4j, using GraphQL.
+We wanted to automate as much as possible 
+    -> minimal developer input -> easy to maintain -> fewer bugs
+Not to use GraphQL as a database query language, but as an API for applications to use.
+
+7 - Graphql -> Cypher
+First objective - Compile GraphQL queries into Cypher.
+Look at the GraphQL query. You can all see how it maps to Cypher.
+Cypher then formats the result directly in the database so we don't need 
+any post processing.
+
++ Run Cypher query in Neo4j Browser
+
+8 - Schema generation
+As mentioned we want to remove boilerplate and auto-generate as much as possible.
+But still leave escape hatches needed for edge cases.
+Check the developer input. This is the output.
++ Talk about mutations (CUD), scroll down to filters and options.
+
+9 - Lets create something
+We will be using an e-commerce system in the following examples.
+You know: products, sizes, colors, variants.
+
+With the small schema we saw on the last slide, we have a server running.
++ Show scehma in VSCode. 
++ Switch to playground.
++ Query for products
++ Talk about creating one. New tab. Create it.
++ Back to query. Show result. 
++ Over to browser. Query for all nodes.
++ Create many.
++ Query in GraphQL.
++ Query in Browser.
++ Move aruond nodes.
+
+10 - Define variant
+This is where things start to get really interesting.
+There's a lot going on here, let me take you through it.
+
+Let's say that what we call "Product" is a base product that's not sold 
+itself, but it has variants, a combination of one color and one size, 
+that are being sold.
+
++ Go from Product, mention the rel type mapping to neo4j, and the direction.
+A Variant has a slug / URL, a price, a reference back to the Product, a color
+and a size.
+
++ Copy typedefs into vscode - make sure server restarts
++ Reload GraphQL Playground and show new docs
+
+11 - Create variant options
+
++ Copy and run both queries.
++ Switch to browser and re-run all nodes
+
+12 - Create variant
+In this query, we are creating a product variant.
+Remember the GraphQL type definitions?
++ Switch to VS code and talk about we need to connect the variant 
+to which product, color and size.
+
++ Copy mutation and run it
++ Copy query and run in new tab
++ Switch to browser and run query
+
+I want to show you one more thing while we're here. 
++ Switch to GraphQL and rename slug to "medium"
+I can also create new colors and sizes here, in addition to connecting to
+existing ones.
++ Drop size line and retype it and create a "Medium" size.
++ Change price
++ Exec
++ Query in GraphQL
++ Query in browser - talk about variants sharing color
+
+13 - Filtering
+
+Let's talk about all the good auto generated stuff we get.
++ Go to playground and run base query
++ Filter out products that has name contaning "e"
+How annoying to see the products without any variants.
++ Filter on variantsAggregate count_GT: 0
+
++ Copy small filter from slide. 
+It does make sense, but it's annoying to write this filter twice.
+Second example, we entry through the variant which means we only need to filter once.
+What you use depends on your data model and use-case.
+
+Can we make it even more interesting?
+What if we add a backlink from the size type?
++ add backlink
+make sure server restarts
++ reload playground
+
+
++ Create new query from 
+query {
+  sizes(where: {name: "Small"}) {
+    variant {
+      slug
+      product {
+        name
+      }
+    }
+  }
+}
+
++ Open browser and explain how we're walking the other way.
+
+14 - many more features
+This was a brief preview and this library is production ready.
+There are so many more features that I didn't have time to talk abotu today.
+
++ Read some of them. Time check.
+
+15 - Give Neo4j a try
+Desktop - Download
+Aura - console.neo4j.io
+Docker - run command

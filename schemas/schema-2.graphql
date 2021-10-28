@@ -1,0 +1,20 @@
+type Product {
+    name: String!
+    variants: [Variant] @relationship(type: "HAS_VARIANTS", direction: OUT)
+}
+
+type Variant {
+    slug: String!
+    price: Float!
+    product: Product! @relationship(type: "HAS_VARIANTS", direction: IN)
+    color: Color! @relationship(type: "IS_COLOR", direction: OUT)
+    size: Size! @relationship(type: "IS_SIZE", direction: OUT)
+}
+
+type Color {
+    name: String!
+}
+
+type Size {
+    name: String!
+}
