@@ -19,7 +19,7 @@
         </div>
         <div class="w-2/5 px-10 flex flex-col items-center">
             <img alt="" class="max-h-80" src="/img/aura.svg" />
-            <p class="text-sm italic">Database as a Service in the coulds.</p>
+            <p class="text-sm italic">Database as a Service in the clouds.</p>
             <p class="text-sm italic">Free tier available.</p>
             <img alt="" class="max-h-72" src="/img/aura-screenshot.png" />
         </div>

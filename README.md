@@ -25,4 +25,4 @@ Can be found in [speaker-notes.txt](speaker-notes.txt)
     -   Slides [oskarhane-talk-2021-11-03.surge.sh](https://oskarhane-talk-2021-11-03.surge.sh) or [http://localhost:3000](http://localhost:3000)
     -   Browser connected to movies database http://browser.graphapp.io/
     -   GraphQL playground https://www.graphqlbin.com/v2/new
-    -   VS code with shema open https://vscode.dev/
+    -   VS code with schema open https://vscode.dev/
