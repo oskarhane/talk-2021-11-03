@@ -57,14 +57,13 @@ class Rel {
                 this.ctx.textBaseline = "middle";
 
                 this.ctx.beginPath();
-                const metrics = this.ctx.measureText(this.properties.caption);
                 const x = this.from.x;
                 const dx = this.to.x - x;
                 const y = this.from.y;
                 const dy = this.to.y - y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                // If text is longer than the rel, don't print it
-                if (metrics.width > dist - this.from.getStrokedR() - this.to.getStrokedR() - this.arrowSize.height) {
+                const visibleCaption = this.calcVisibleCaption(dist);
+                if (!visibleCaption) {
                     return;
                 }
                 this.ctx.save();
@@ -74,7 +73,7 @@ class Rel {
                 } else {
                     this.ctx.rotate(Math.atan2(dy / 2, dx / 2) + Math.PI);
                 }
-                this.ctx.fillText(this.properties.caption, 0, -10);
+                this.ctx.fillText(visibleCaption, 0, -10);
                 this.ctx.restore();
             }
         }
@@ -206,6 +205,20 @@ class Rel {
 
         this.ctx.translate(-x, -y);
         this.ctx.restore();
+    }
+    calcVisibleCaption(dist) {
+        let caption = this.properties.caption;
+        let dots = "";
+        while (caption.length) {
+            const metrics = this.ctx.measureText(caption + dots);
+            if (metrics.width > dist - this.from.getStrokedR() - this.to.getStrokedR() - this.arrowSize.height) {
+                caption = caption.slice(0, -1);
+                dots = "...";
+            } else {
+                break;
+            }
+        }
+        return caption + dots;
     }
 }
 
