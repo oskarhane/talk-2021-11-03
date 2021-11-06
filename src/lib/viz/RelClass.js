@@ -69,7 +69,11 @@ class Rel {
                 }
                 this.ctx.save();
                 this.ctx.translate(x + dx / 2, y + dy / 2);
-                this.ctx.rotate(Math.atan2(dy / 2, dx / 2));
+                if (dx > 0) {
+                    this.ctx.rotate(Math.atan2(dy / 2, dx / 2));
+                } else {
+                    this.ctx.rotate(Math.atan2(dy / 2, dx / 2) + Math.PI);
+                }
                 this.ctx.fillText(this.properties.caption, 0, -10);
                 this.ctx.restore();
             }
