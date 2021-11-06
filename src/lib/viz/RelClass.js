@@ -8,12 +8,13 @@ class Rel {
         this.numberOfSharedRels = numberOfSharedRels;
         this.spreadIndex = spreadIndex - 1;
         this.MAX_SHARED_RELS = 12;
-        this.arrowSize = { height: 10, width: 4 };
         const color = style.color || "rgba(0, 80, 0, .8)";
         const strokeWidth = style.strokeWidth || 2;
+        this.arrowSize = { height: strokeWidth * 5, width: strokeWidth * 2 };
         this.style = { color, strokeWidth, fontSize: 16 };
         this.cache = { curved: null, straight: null };
         this.properties = properties;
+        this.padding = this.arrowSize.height;
     }
     draw(filterNode) {
         if (filterNode && ![this.from.id, this.to.id].includes(filterNode.id)) {
@@ -43,26 +44,20 @@ class Rel {
             this.ctx.stroke();
             this.drawArrow(this.cache.curved.arrowAngle, this.style.color);
         } else if (this.cache.straight) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.cache.straight.start.x, this.cache.straight.start.y);
-            this.ctx.lineTo(this.cache.straight.end.x, this.cache.straight.end.y);
-            this.ctx.strokeStyle = this.style.color;
-            this.ctx.lineWidth = this.style.strokeWidth;
-            this.ctx.stroke();
-            this.drawArrow(this.cache.straight.arrowAngle, this.style.color);
+            let captionSpace = null;
+            const x = this.cache.straight.start.x;
+            const dx = this.cache.straight.end.x - x;
+            const y = this.cache.straight.start.y;
+            const dy = this.cache.straight.end.y - y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
             if (this.properties.caption) {
                 this.ctx.fillStyle = this.style.captionStyle || "black";
-                this.ctx.textAlign = "center";
+
                 this.ctx.font = this.style.fontSize + "px Arial";
                 this.ctx.textBaseline = "middle";
+                this.ctx.textAlign = "center";
 
-                this.ctx.beginPath();
-                const x = this.from.x;
-                const dx = this.to.x - x;
-                const y = this.from.y;
-                const dy = this.to.y - y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                const visibleCaption = this.calcVisibleCaption(dist);
+                const [visibleCaption, captionWidth] = this.calcVisibleCaption(dist);
                 if (!visibleCaption) {
                     return;
                 }
@@ -73,9 +68,28 @@ class Rel {
                 } else {
                     this.ctx.rotate(Math.atan2(dy / 2, dx / 2) + Math.PI);
                 }
-                this.ctx.fillText(visibleCaption, 0, -10);
+                this.ctx.fillText(visibleCaption, 0, 0);
                 this.ctx.restore();
+                captionSpace = { width: captionWidth, x: x + dx / 2, y: y + dy / 2 };
             }
+
+            this.ctx.moveTo(this.cache.straight.start.x, this.cache.straight.start.y);
+            if (!captionSpace) {
+                this.ctx.lineTo(this.cache.straight.end.x, this.cache.straight.end.y);
+            } else {
+                const textStartX = x - (dist / 2 - captionSpace.width / 2) * Math.cos(this.cache.straight.arrowAngle);
+                const textStartY = y - (dist / 2 - captionSpace.width / 2) * Math.sin(this.cache.straight.arrowAngle);
+                this.ctx.lineTo(textStartX, textStartY);
+
+                const textEndX = textStartX - captionSpace.width * Math.cos(this.cache.straight.arrowAngle);
+                const textEndY = textStartY - captionSpace.width * Math.sin(this.cache.straight.arrowAngle);
+                this.ctx.moveTo(textEndX, textEndY);
+                this.ctx.lineTo(this.cache.straight.end.x, this.cache.straight.end.y);
+            }
+            this.ctx.strokeStyle = this.style.color;
+            this.ctx.lineWidth = this.style.strokeWidth;
+            this.ctx.stroke();
+            this.drawArrow(this.cache.straight.arrowAngle, this.style.color);
         }
     }
 
@@ -209,16 +223,18 @@ class Rel {
     calcVisibleCaption(dist) {
         let caption = this.properties.caption;
         let dots = "";
+        let metrics = { width: 0 };
+
         while (caption.length) {
-            const metrics = this.ctx.measureText(caption + dots);
-            if (metrics.width > dist - this.from.getStrokedR() - this.to.getStrokedR() - 2 * this.arrowSize.height) {
+            metrics = this.ctx.measureText(caption + dots);
+            if (metrics.width + this.padding > dist - 2 * this.padding) {
                 caption = caption.slice(0, -1);
                 dots = "...";
             } else {
                 break;
             }
         }
-        return caption + dots;
+        return [caption + dots, metrics.width + this.padding];
     }
 }
 

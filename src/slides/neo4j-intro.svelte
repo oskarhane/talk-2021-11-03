@@ -10,7 +10,7 @@
             {
                 id: 1,
                 x: 40,
-                y: 40,
+                y: 50,
                 properties: {
                     caption: "Jenny",
                 },
@@ -38,7 +38,7 @@
             {
                 id: 3,
                 x: 130,
-                y: 210,
+                y: 225,
                 properties: {
                     caption: "Blog post",
                 },
