@@ -211,7 +211,7 @@ class Rel {
         let dots = "";
         while (caption.length) {
             const metrics = this.ctx.measureText(caption + dots);
-            if (metrics.width > dist - this.from.getStrokedR() - this.to.getStrokedR() - this.arrowSize.height) {
+            if (metrics.width > dist - this.from.getStrokedR() - this.to.getStrokedR() - 2 * this.arrowSize.height) {
                 caption = caption.slice(0, -1);
                 dots = "...";
             } else {
