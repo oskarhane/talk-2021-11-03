@@ -30,18 +30,85 @@ class Rel {
     }
 
     drawFromCache() {
+        this.ctx.fillStyle = this.style.captionStyle || "black";
+        this.ctx.font = this.style.fontSize + "px Arial";
+        this.ctx.textBaseline = "middle";
+        this.ctx.textAlign = "center";
+
         if (this.cache.curved) {
-            this.ctx.beginPath();
+            let { endAngle, startAngle } = this.cache.curved;
+            let dAngle = endAngle - startAngle;
+            if (startAngle > endAngle) {
+                dAngle = Math.atan2(Math.sin(startAngle - endAngle), Math.cos(startAngle - endAngle));
+                [endAngle, startAngle] = [startAngle, endAngle];
+            }
+            let dist = Math.abs(dAngle) * this.cache.curved.r;
+            const centerAngle = Math.atan2(Math.sin(startAngle + dAngle / 2), Math.cos(startAngle + dAngle / 2));
+
+            const textCenterX = this.cache.curved.cx + this.cache.curved.r * Math.cos(centerAngle);
+            const textCenterY = this.cache.curved.cy + this.cache.curved.r * Math.sin(centerAngle);
+
+            let captionSpace = null;
+            if (this.properties.caption) {
+                const [visibleCaption, captionWidth] = this.calcVisibleCaption(dist);
+                if (!visibleCaption) {
+                    return;
+                }
+                this.ctx.save();
+                this.ctx.translate(textCenterX, textCenterY);
+                if (centerAngle < 0) {
+                    this.ctx.rotate(centerAngle + Math.PI / 2);
+                } else {
+                    this.ctx.rotate(centerAngle - Math.PI / 2);
+                }
+                this.ctx.fillText(visibleCaption, 0, 0);
+                const textWidthAngle = Math.acos(1 - Math.pow(captionWidth / this.cache.curved.r, 2) / 2);
+                const textStartAngle = centerAngle - textWidthAngle / 2;
+                const textEndAngle = centerAngle + textWidthAngle / 2;
+                this.ctx.restore();
+                captionSpace = {
+                    width: captionWidth,
+                    x: textCenterX,
+                    y: textCenterY,
+                    centerAngle,
+                    textStartAngle,
+                    textEndAngle,
+                };
+            }
+
             this.ctx.strokeStyle = this.style.color;
             this.ctx.lineWidth = this.style.strokeWidth;
-            this.ctx.arc(
-                this.cache.curved.cx,
-                this.cache.curved.cy,
-                this.cache.curved.r,
-                this.cache.curved.startAngle,
-                this.cache.curved.endAngle
-            );
-            this.ctx.stroke();
+            if (!captionSpace) {
+                this.ctx.beginPath();
+                this.ctx.arc(
+                    this.cache.curved.cx,
+                    this.cache.curved.cy,
+                    this.cache.curved.r,
+                    this.cache.curved.startAngle,
+                    this.cache.curved.endAngle
+                );
+                this.ctx.stroke();
+            } else {
+                this.ctx.beginPath();
+                this.ctx.arc(
+                    this.cache.curved.cx,
+                    this.cache.curved.cy,
+                    this.cache.curved.r,
+                    this.cache.curved.startAngle,
+                    captionSpace.textStartAngle
+                );
+                this.ctx.stroke();
+                this.ctx.beginPath();
+                this.ctx.arc(
+                    this.cache.curved.cx,
+                    this.cache.curved.cy,
+                    this.cache.curved.r,
+                    captionSpace.textEndAngle,
+                    this.cache.curved.endAngle
+                );
+                this.ctx.stroke();
+            }
+
             this.drawArrow(this.cache.curved.arrowAngle, this.style.color);
         } else if (this.cache.straight) {
             let captionSpace = null;
@@ -51,12 +118,6 @@ class Rel {
             const dy = this.cache.straight.end.y - y;
             const dist = Math.sqrt(dx * dx + dy * dy);
             if (this.properties.caption) {
-                this.ctx.fillStyle = this.style.captionStyle || "black";
-
-                this.ctx.font = this.style.fontSize + "px Arial";
-                this.ctx.textBaseline = "middle";
-                this.ctx.textAlign = "center";
-
                 const [visibleCaption, captionWidth] = this.calcVisibleCaption(dist);
                 if (!visibleCaption) {
                     return;
@@ -121,6 +182,7 @@ class Rel {
 
         // If we're overlapping the other connected node, don't draw anything
         if (len < this.from.getStrokedR() + this.to.getStrokedR() + this.arrowSize.height) {
+            this.cache.curved = {};
             return;
         }
         const dist = len / 2;
@@ -169,7 +231,6 @@ class Rel {
             startAngle = startAngle + this.from.getStrokedR() / r;
             endAngle = endAngle - (this.to.getStrokedR() + this.arrowSize.height) / r;
         }
-
         this.cache.curved = { cx, cy, r, startAngle, endAngle, arrowAngle };
     }
 
