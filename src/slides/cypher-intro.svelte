@@ -27,7 +27,7 @@ RETURN *`,
             },
             {
                 id: 2,
-                x: 240,
+                x: 270,
                 y: 75,
                 properties: {
                     caption: "Movie",
@@ -52,7 +52,7 @@ RETURN *`,
         It's a visual and logical way to match patterns of elements in the graph. It's declarative and describes patterns
         in a visual way using ASCII-art syntax.
     </div>
-    <div class="flex justify-around mt-8 w-3/4 mx-auto">
+    <div class="flex justify-around mt-8 w-full mx-auto">
         <div class="w-1/2 flex flex-col justify-center">
             {#each cyphers as cypher}
                 <div>
@@ -61,7 +61,7 @@ RETURN *`,
             {/each}
         </div>
         <div class="w-1/2 flex flex-row justify-center">
-            <div class="mx-20">
+            <div class="mx-10 w-full">
                 <Graph {nodes} {relationships} />
             </div>
         </div>
