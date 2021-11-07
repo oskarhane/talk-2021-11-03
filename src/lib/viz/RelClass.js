@@ -51,9 +51,6 @@ class Rel {
             let captionSpace = null;
             if (this.properties.caption) {
                 const [visibleCaption, captionWidth] = this.calcVisibleCaption(dist);
-                if (!visibleCaption) {
-                    return;
-                }
                 this.ctx.save();
                 this.ctx.translate(textCenterX, textCenterY);
                 if (centerAngle < 0) {
@@ -90,23 +87,26 @@ class Rel {
                 this.ctx.stroke();
             } else {
                 this.ctx.beginPath();
-                this.ctx.arc(
-                    this.cache.curved.cx,
-                    this.cache.curved.cy,
-                    this.cache.curved.r,
-                    this.cache.curved.startAngle,
-                    captionSpace.textStartAngle
-                );
-                this.ctx.stroke();
-                this.ctx.beginPath();
-                this.ctx.arc(
-                    this.cache.curved.cx,
-                    this.cache.curved.cy,
-                    this.cache.curved.r,
-                    captionSpace.textEndAngle,
-                    this.cache.curved.endAngle
-                );
-                this.ctx.stroke();
+
+                if (dist > captionSpace.width) {
+                    this.ctx.arc(
+                        this.cache.curved.cx,
+                        this.cache.curved.cy,
+                        this.cache.curved.r,
+                        this.cache.curved.startAngle,
+                        captionSpace.textStartAngle
+                    );
+                    this.ctx.stroke();
+                    this.ctx.beginPath();
+                    this.ctx.arc(
+                        this.cache.curved.cx,
+                        this.cache.curved.cy,
+                        this.cache.curved.r,
+                        captionSpace.textEndAngle,
+                        this.cache.curved.endAngle
+                    );
+                    this.ctx.stroke();
+                }
             }
 
             this.drawArrow(this.cache.curved.arrowAngle, this.style.color);
