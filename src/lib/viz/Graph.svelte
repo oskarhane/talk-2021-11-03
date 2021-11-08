@@ -23,32 +23,34 @@
     $: if (relationships || nodes) {
         relMap = {};
     }
-    $: _rels = relationships.map(({ fromId, toId, style, properties }) => {
-        const from = _nodes.find((n) => n.id === fromId);
-        const to = _nodes.find((n) => n.id === toId);
-        if (!from || !to) {
-            return;
-        }
+    $: _rels = relationships
+        .map(({ fromId, toId, style, properties }) => {
+            const from = _nodes.find((n) => n.id === fromId);
+            const to = _nodes.find((n) => n.id === toId);
+            if (!from || !to) {
+                return null;
+            }
 
-        // Store and calculate spreadIndex for curving rels when multiple between nodes
-        if (typeof relMap[fromId] === "undefined") {
-            relMap[fromId] = { [toId]: 0 };
-        }
-        if (typeof relMap[fromId][toId] === "undefined") {
-            relMap[fromId][toId] = 0;
-        }
-        relMap[fromId][toId] += 1;
-        const spreadIndex = numberOfSharedRels(relMap, fromId, toId)();
-        return new RelClass({
-            ctx,
-            from,
-            to,
-            style,
-            spreadIndex,
-            numberOfSharedRels: numberOfSharedRels(relMap, fromId, toId),
-            properties,
-        });
-    });
+            // Store and calculate spreadIndex for curving rels when multiple between nodes
+            if (typeof relMap[fromId] === "undefined") {
+                relMap[fromId] = { [toId]: 0 };
+            }
+            if (typeof relMap[fromId][toId] === "undefined") {
+                relMap[fromId][toId] = 0;
+            }
+            relMap[fromId][toId] += 1;
+            const spreadIndex = numberOfSharedRels(relMap, fromId, toId)();
+            return new RelClass({
+                ctx,
+                from,
+                to,
+                style,
+                spreadIndex,
+                numberOfSharedRels: numberOfSharedRels(relMap, fromId, toId),
+                properties,
+            });
+        })
+        .filter((r) => r);
 
     onMount(() => {
         ctx = canvas.getContext("2d");

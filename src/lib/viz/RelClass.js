@@ -49,7 +49,7 @@ class Rel {
             const textCenterY = this.cache.curved.cy + this.cache.curved.r * Math.sin(centerAngle);
 
             let captionSpace = null;
-            if (this.properties.caption) {
+            if (this.properties.caption && !Number.isNaN(dist)) {
                 const [visibleCaption, captionWidth] = this.calcVisibleCaption(dist);
                 this.ctx.save();
                 this.ctx.translate(textCenterX, textCenterY);
@@ -109,7 +109,9 @@ class Rel {
                 }
             }
 
-            this.drawArrow(this.cache.curved.arrowAngle, this.style.color);
+            if (this.cache.curved.arrowAngle !== undefined) {
+                this.drawArrow(this.cache.curved.arrowAngle, this.style.color);
+            }
         } else if (this.cache.straight) {
             let captionSpace = null;
             const x = this.cache.straight.start.x;
