@@ -170,6 +170,10 @@ class Rel {
             if (this.spreadIndex % 2) {
                 arcDirectionClockwise = false;
             }
+        } else {
+            if (this.spreadIndex % 2 === 0) {
+                arcDirectionClockwise = false;
+            }
         }
 
         const dx = this.to.x - this.from.x;
@@ -181,8 +185,10 @@ class Rel {
             this.cache.curved = {};
             return;
         }
-        const dist = len / 2;
-
+        // Flip sides to don't have overlapping rels
+        if (dx < 0) {
+            arcDirectionClockwise = !arcDirectionClockwise;
+        }
         // Curve fitting from manual testing
         // Only handles up to a certain amount. This is why we have the MAX_SHARED_RELS
         const kFactor = 1.28666 - 0.323441 * Math.log(2.64525 * numDrawnSharedRels - 3.07871);
