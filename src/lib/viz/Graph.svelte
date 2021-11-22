@@ -1,60 +1,74 @@
 <script>
-    import { onMount } from "svelte";
+    import { onMount, setContext } from "svelte";
     import NodeClass from "./NodeClass";
     import RelClass from "./RelClass";
     import { numberOfSharedRels } from "./utils";
 
+    setContext("graph", {
+        addNode,
+        addRelationship,
+    });
+
     export let w = 500;
     export let h = 450;
+    export let nodes = [];
+    export let relationships = [];
 
+    const mouse = { offX: 0, offY: 0, dragging: false };
     let ctx, canvas, activeNode;
     let relMap = {};
-    const mouse = { offX: 0, offY: 0, dragging: false };
     let takenNodeIds = [];
-    export let nodes = [];
-    $: _nodes = [];
-    $: {
-        const newNodes = nodes.filter((n) => !takenNodeIds.includes(n.id)).map((n) => new NodeClass({ ...n, ctx }));
-        takenNodeIds = [...takenNodeIds, ...newNodes.map((n) => n.id)];
-        _nodes = _nodes.concat(newNodes);
-    }
-    export let relationships = [];
+
+    let _nodes = [];
+    $: nodes.filter((n) => !takenNodeIds.includes(n.id)).map(addNode);
 
     $: if (relationships || nodes) {
         relMap = {};
     }
-    $: _rels = relationships
-        .map(({ fromId, toId, style, properties }) => {
-            const from = _nodes.find((n) => n.id === fromId);
-            const to = _nodes.find((n) => n.id === toId);
-            if (!from || !to) {
-                return null;
-            }
 
-            // Store and calculate spreadIndex for curving rels when multiple between nodes
-            if (typeof relMap[fromId] === "undefined") {
-                relMap[fromId] = { [toId]: 0 };
-            }
-            if (typeof relMap[fromId][toId] === "undefined") {
-                relMap[fromId][toId] = 0;
-            }
-            relMap[fromId][toId] += 1;
-            const spreadIndex = numberOfSharedRels(relMap, fromId, toId)();
-            return new RelClass({
-                ctx,
-                from,
-                to,
-                style,
-                spreadIndex,
-                numberOfSharedRels: numberOfSharedRels(relMap, fromId, toId),
-                properties,
-            });
-        })
-        .filter((r) => r);
+    let _rels = [];
+    $: relationships.map(addRelationship);
+
+    function addNode(n) {
+        const nodeInstance = new NodeClass({ ...n, ctx });
+        takenNodeIds.push(n.id);
+        _nodes = _nodes.concat(nodeInstance);
+    }
+
+    function addRelationship({ fromId, toId, style, properties }) {
+        const from = _nodes.find((n) => n.id === fromId);
+        const to = _nodes.find((n) => n.id === toId);
+        if (!from || !to) {
+            return null;
+        }
+
+        if (typeof relMap[fromId] === "undefined") {
+            relMap[fromId] = { [toId]: 0 };
+        }
+        if (typeof relMap[fromId][toId] === "undefined") {
+            relMap[fromId][toId] = 0;
+        }
+        relMap[fromId][toId] += 1;
+        const spreadIndex = numberOfSharedRels(relMap, fromId, toId)();
+        const rel = new RelClass({
+            ctx,
+            from,
+            to,
+            style,
+            spreadIndex,
+            numberOfSharedRels: numberOfSharedRels(relMap, fromId, toId),
+            properties,
+        });
+        _rels = _rels.concat(rel);
+    }
+    // function removeRelationship(id) {
+    //     const relInstance = _rels.find(rel => rel.id === id);
+    //     _rels = _rels.filter(rel => rel.id === id);
+    // }
 
     onMount(() => {
         ctx = canvas.getContext("2d");
-        //ctx.imageSmoothingEnabled = false;
+
         const scale = window.devicePixelRatio;
         w = canvas.parentElement.clientWidth;
         h = canvas.parentElement.clientHeight;
@@ -120,3 +134,4 @@
 </script>
 
 <canvas bind:this={canvas} />
+<slot />

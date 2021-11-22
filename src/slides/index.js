@@ -1,4 +1,5 @@
 //export { default as a0 } from "./graph-tests.svelte";
+export { default as a0 } from "./viz-playground.svelte";
 export { default as a00 } from "./zero.svelte";
 export { default as a001 } from "./intro.svelte";
 export { default as a002 } from "./about-me.svelte";
