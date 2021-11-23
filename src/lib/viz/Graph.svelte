@@ -11,8 +11,6 @@
 
     export let w = 500;
     export let h = 450;
-    export let nodes = [];
-    export let relationships = [];
 
     const mouse = { offX: 0, offY: 0, dragging: false, down: false };
     let ctx, canvas, activeNode;
@@ -20,14 +18,7 @@
     let takenNodeIds = [];
 
     let _nodes = [];
-    $: nodes.filter((n) => !takenNodeIds.includes(n.id)).map(addNode);
-
-    $: if (relationships || nodes) {
-        relMap = {};
-    }
-
     let _rels = [];
-    $: relationships.map(addRelationship);
 
     function addNode(n) {
         const nodeInstance = new NodeClass({ ...n, ctx });

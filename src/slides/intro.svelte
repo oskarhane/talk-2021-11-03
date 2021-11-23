@@ -2,6 +2,8 @@
     import { onMount } from "svelte";
     import Graph from "../lib/viz/Graph.svelte";
     import Slide from "../lib/Slide.svelte";
+    import Node from "../lib/viz/Node.svelte";
+    import Rel from "../lib/viz/Rel.svelte";
 
     let nodes = [];
     let relationships = [];
@@ -58,7 +60,14 @@
         <p class="mt-2 text-base text-center text-gray-800 opacity-50 italic">3rd of November 2021</p>
     </div>
     <div class="absolute top-0 left-0 right-0 bottom-0 w-full h-full">
-        <Graph {nodes} {relationships} />
+        <Graph>
+            {#each nodes as node}
+                <Node {...node} />
+            {/each}
+            {#each relationships as relationship}
+                <Rel {...relationship} />
+            {/each}
+        </Graph>
     </div>
     <div class="flex justify-center absolute bottom-0 w-full left-0 pb-4">
         <button class="px-5 py-1 border rounded active:bg-green-700" on:click={createNode}>MOAR</button>

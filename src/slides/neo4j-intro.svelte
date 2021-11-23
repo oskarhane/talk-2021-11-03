@@ -1,8 +1,9 @@
 <script>
     import Slide from "../lib/Slide.svelte";
-    import Code from "../lib/Code.svelte";
     import Graph from "../lib/viz/Graph.svelte";
     import { onMount } from "svelte";
+    import Node from "../lib/viz/Node.svelte";
+    import Rel from "../lib/viz/Rel.svelte";
     let nodes = [];
     let relationships = [];
     onMount(() => {
@@ -72,7 +73,14 @@
             </ul>
         </div>
         <div class="w-1/2 h-64">
-            <Graph {nodes} {relationships} />
+            <Graph>
+                {#each nodes as node}
+                    <Node {...node} />
+                {/each}
+                {#each relationships as relationship}
+                    <Rel {...relationship} />
+                {/each}
+            </Graph>
         </div>
     </div>
 </Slide>

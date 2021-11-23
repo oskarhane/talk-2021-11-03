@@ -3,6 +3,8 @@
     import Code from "../lib/Code.svelte";
     import Graph from "../lib/viz/Graph.svelte";
     import { onMount } from "svelte";
+    import Node from "../lib/viz/Node.svelte";
+    import Rel from "../lib/viz/Rel.svelte";
 
     const schema1 = `
 type Product {
@@ -91,7 +93,14 @@ type Size {
             <Code language="graphql" code={schema1} />
         </div>
         <div class="w-1/4 mx-auto">
-            <Graph {nodes} {relationships} />
+            <Graph>
+                {#each nodes as node}
+                    <Node {...node} />
+                {/each}
+                {#each relationships as relationship}
+                    <Rel {...relationship} />
+                {/each}
+            </Graph>
         </div>
     </div>
 </Slide>

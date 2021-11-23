@@ -69,7 +69,14 @@
 <Slide --bg-color="#cccccc">
     <div class="flex mt-8 mx-auto w-full h-128">
         <div class="w-1/2">
-            <Graph {nodes} {relationships} />
+            <Graph>
+                {#each nodes as node}
+                    <Node {...node} on:click={() => nodeClicked(node)} />
+                {/each}
+                {#each relationships as rel}
+                    <Rel {...rel} />
+                {/each}
+            </Graph>
         </div>
         <div class="w-1/2">
             <Graph>
