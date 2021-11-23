@@ -14,7 +14,7 @@
     export let nodes = [];
     export let relationships = [];
 
-    const mouse = { offX: 0, offY: 0, dragging: false };
+    const mouse = { offX: 0, offY: 0, dragging: false, down: false };
     let ctx, canvas, activeNode;
     let relMap = {};
     let takenNodeIds = [];
@@ -33,6 +33,7 @@
         const nodeInstance = new NodeClass({ ...n, ctx });
         takenNodeIds.push(n.id);
         _nodes = _nodes.concat(nodeInstance);
+        return nodeInstance;
     }
 
     function addRelationship({ fromId, toId, style, properties }) {
@@ -60,6 +61,7 @@
             properties,
         });
         _rels = _rels.concat(rel);
+        return rel;
     }
     // function removeRelationship(id) {
     //     const relInstance = _rels.find(rel => rel.id === id);
@@ -80,24 +82,25 @@
         canvas.addEventListener("mousemove", movingMouse);
         canvas.addEventListener("mousedown", downMouse);
         canvas.addEventListener("mouseup", upMouse);
-        canvas.addEventListener("click", clickedMouse);
+        // canvas.addEventListener("click", clickedMouse);
         draw();
         return () => {
             canvas.removeEventListener("mousemove", movingMouse);
-            canvas.removeEventListener("click", clickedMouse);
+            // canvas.removeEventListener("click", clickedMouse);
             canvas.removeEventListener("mousedown", downMouse);
             canvas.removeEventListener("mouseup", upMouse);
         };
     });
     function movingMouse({ offsetX, offsetY }) {
-        if (mouse.dragging && activeNode) {
+        if (mouse.down && activeNode) {
+            mouse.dragging = true;
             activeNode.dragged = true;
             activeNode.moveTo(offsetX + mouse.offX, offsetY + mouse.offY);
             draw(activeNode);
         }
     }
     function downMouse({ offsetX, offsetY }) {
-        mouse.dragging = true;
+        mouse.down = true;
         for (let i = _nodes.length - 1; i >= 0; i--) {
             if (_nodes[i].isInside(offsetX, offsetY)) {
                 const n = _nodes[i];
@@ -112,12 +115,18 @@
         draw();
     }
     function upMouse() {
+        if (!mouse.dragging && activeNode) {
+            clickedMouse(activeNode);
+        }
+        mouse.down = false;
         activeNode = null;
         mouse.dragging = false;
         _nodes.forEach((n) => (n.dragged = false));
         draw();
     }
-    function clickedMouse(e) {}
+    function clickedMouse(activeNode) {
+        activeNode.clicked();
+    }
     function draw(filterNode) {
         ctx.clearRect(0, 0, w, h);
         _rels.forEach((rel) => {

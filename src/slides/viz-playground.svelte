@@ -60,6 +60,10 @@
             { fromId: 2, toId: 4, properties: { caption: "IS_COLOR" } },
         ];
     });
+
+    function nodeClicked(n) {
+        console.log(n);
+    }
 </script>
 
 <Slide --bg-color="#cccccc">
@@ -70,7 +74,7 @@
         <div class="w-1/2">
             <Graph>
                 {#each nodes as node}
-                    <Node {...node} />
+                    <Node {...node} on:click={() => nodeClicked(node)} />
                 {/each}
                 {#each relationships as rel}
                     <Rel {...rel} />

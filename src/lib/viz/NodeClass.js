@@ -1,5 +1,5 @@
 class Node {
-    constructor({ id, x, y, ctx, style = {}, properties = {} }) {
+    constructor({ id, x, y, ctx, style = {}, properties = {}, onClick }) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -12,6 +12,10 @@ class Node {
 
         this.style.fontSize = 20;
         this.calculateFontSize();
+        this.onClick = onClick || function () {};
+    }
+    clicked() {
+        this.onClick(this);
     }
     getStrokedR() {
         return this.style.radius || 20 + this.strokeWidth / 2;
