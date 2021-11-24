@@ -39,7 +39,7 @@
         _nodes = _nodes.filter((n) => n.id !== id);
     }
 
-    function addRelationship({ fromId, toId, style, properties }) {
+    function addRelationship({ id, fromId, toId, style, caption }) {
         const from = _nodes.find((n) => n.id === fromId);
         const to = _nodes.find((n) => n.id === toId);
         if (!from || !to) {
@@ -54,14 +54,16 @@
         }
         relMap[fromId][toId] += 1;
         const spreadIndex = numberOfSharedRels(relMap, fromId, toId)();
+        id = id || Math.floor(Math.random() * 99999999);
         const rel = new RelClass({
+            id,
             ctx,
             from,
             to,
             style,
             spreadIndex,
             numberOfSharedRels: numberOfSharedRels(relMap, fromId, toId),
-            properties,
+            caption,
         });
         _rels = _rels.concat(rel);
         return rel;

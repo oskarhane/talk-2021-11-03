@@ -4,8 +4,9 @@
     import { onMount } from "svelte";
     import Rel from "../lib/viz/Rel.svelte";
     import Node from "../lib/viz/Node.svelte";
-    import Stroke from "../lib/viz/style/Stroke.svelte";
-    import Size from "../lib/viz/style/Size.svelte";
+    import Stroke from "../lib/viz/addons/Stroke.svelte";
+    import Size from "../lib/viz/addons/Size.svelte";
+    import Caption from "../lib/viz/addons/Caption.svelte";
 
     let selectedNode;
     let nodes = [];
@@ -16,39 +17,35 @@
                 id: 1,
                 x: 122,
                 y: 52,
-                properties: {
-                    caption: "Product",
-                },
+                properties: { weight: 1 },
+                title: "Product",
             },
             {
                 id: 2,
                 x: 122,
                 y: 274,
-                properties: {
-                    caption: "Variant",
-                },
+                properties: { weight: 2 },
+                title: "Variant",
             },
             {
                 id: 3,
                 x: 202,
                 y: 452,
-                properties: {
-                    caption: "Size",
-                },
+                properties: { weight: 3 },
+                title: "Size",
             },
             {
                 id: 4,
                 x: 82,
                 y: 452,
-                properties: {
-                    caption: "Color",
-                },
+                properties: { weight: 4 },
+                title: "Color",
             },
         ];
         relationships = [
-            { fromId: 1, toId: 2, properties: { caption: "HAS_VARIANTS" } },
-            { fromId: 2, toId: 3, properties: { caption: "IS_SIZE" } },
-            { fromId: 2, toId: 4, properties: { caption: "IS_COLOR" } },
+            { fromId: 1, toId: 2, title: "HAS_VARIANTS" },
+            { fromId: 2, toId: 3, title: "IS_SIZE" },
+            { fromId: 2, toId: 4, title: "IS_COLOR" },
         ];
     });
 
@@ -63,12 +60,13 @@
 </script>
 
 <Slide --bg-color="#cccccc">
-    <div class="flex mt-8 mx-auto w-full h-128">
+    <div class="flex mt-8 mx-auto w-full h-144">
         <div class="w-1/2">
             <Graph>
                 {#each nodes as node}
                     <Node {...node} on:click={nodeClicked}>
-                        <Size radius={40} />
+                        <Caption text={node.title} />
+                        <Size radius={node.properties.weight * 10 + 10} />
                         {#if selectedNode && selectedNode.id === node.id}
                             <Stroke color="orange" width={10} />
                         {:else}
@@ -77,7 +75,9 @@
                     </Node>
                 {/each}
                 {#each relationships as rel}
-                    <Rel {...rel} />
+                    <Rel {...rel}>
+                        <Caption text={rel.title} />
+                    </Rel>
                 {/each}
             </Graph>
         </div>
@@ -85,12 +85,15 @@
             <Graph>
                 {#each nodes as node}
                     <Node {...node}>
+                        <Caption text={node.title} />
                         <Stroke color="pink" />
                         <Size radius={30} />
                     </Node>
                 {/each}
                 {#each relationships as rel}
-                    <Rel {...rel} />
+                    <Rel {...rel}>
+                        <Caption text={rel.title} />
+                    </Rel>
                 {/each}
             </Graph>
         </div>

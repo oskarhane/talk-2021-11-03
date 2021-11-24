@@ -1,9 +1,9 @@
 class Node {
-    constructor({ id, x, y, ctx, style = {}, properties = {}, onClick }) {
+    constructor({ id, x, y, ctx, style = {}, caption = { text: "" }, onClick }) {
         this.id = id;
         this.x = x;
         this.y = y;
-        this.properties = properties;
+        this.caption = caption;
         this.ctx = ctx;
         this.style = style;
         this.style.strokeWidth = 3;
@@ -17,6 +17,9 @@ class Node {
         this.style.radius = this.style.radius || 20;
         this.r = this.style.radius;
         this.calculateFontSize();
+    }
+    updateCaption(text) {
+        this.caption.text = text;
     }
     updateStyle(style) {
         const radius = Number(style.radius || this.style.radius);
@@ -46,22 +49,22 @@ class Node {
         }
         this.ctx.stroke();
 
-        if (this.properties.caption) {
+        if (this.caption.text) {
             this.ctx.beginPath();
             this.ctx.fillStyle = this.style.captionStyle || "black";
             this.ctx.textAlign = "center";
             this.ctx.font = this.fontSize + "px Arial";
             this.ctx.textBaseline = "middle";
-            this.ctx.fillText(this.properties.caption, this.x, this.y);
+            this.ctx.fillText(this.caption.text, this.x, this.y);
         }
     }
     isInside(x, y) {
         return (x - this.x) ** 2 + (y - this.y) ** 2 <= this.getStrokedR() ** 2;
     }
     calculateFontSize() {
-        if (this.properties.caption) {
+        if (this.caption.text) {
             this.ctx.font = this.fontSize + "px Arial";
-            const text = this.ctx.measureText(this.properties.caption);
+            const text = this.ctx.measureText(this.caption.text);
             if (text.width > this.r * 2 - 10) {
                 this.fontSize--;
                 this.calculateFontSize();

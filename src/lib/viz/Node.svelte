@@ -4,7 +4,7 @@
     export let id;
     export let x;
     export let y;
-    export let properties;
+    export let caption;
     export let style;
 
     let node = {};
@@ -19,6 +19,14 @@
         },
         reportDirty,
     });
+    setContext("graph-items", {
+        updateCaption: (text) => {
+            if (node && node.updateCaption) {
+                node.updateCaption(text);
+            }
+        },
+        reportDirty,
+    });
 
     const dispatch = createEventDispatcher();
     function onClick() {
@@ -26,7 +34,7 @@
     }
 
     onMount(() => {
-        node = addNode({ id, x, y, properties, style, onClick });
+        node = addNode({ id, x, y, caption, style, onClick });
     });
 </script>
 

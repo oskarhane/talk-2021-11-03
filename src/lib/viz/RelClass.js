@@ -1,7 +1,8 @@
 import { findIntersections } from "./utils";
 
 class Rel {
-    constructor({ from, to, ctx, spreadIndex, numberOfSharedRels, properties = {}, style = {} }) {
+    constructor({ id, from, to, ctx, spreadIndex, numberOfSharedRels, caption = { text: "" }, style = {} }) {
+        this.id = id;
         this.to = to;
         this.from = from;
         this.ctx = ctx;
@@ -13,7 +14,7 @@ class Rel {
         this.arrowSize = { height: strokeWidth * 5, width: strokeWidth * 2 };
         this.style = { color, strokeWidth, fontSize: 16 };
         this.cache = { curved: null, straight: null };
-        this.properties = properties;
+        this.caption = caption;
         this.padding = this.arrowSize.height;
     }
     draw(filterNode) {
@@ -28,7 +29,9 @@ class Rel {
         }
         this.drawFromCache();
     }
-
+    updateCaption(text) {
+        this.caption.text = text;
+    }
     drawFromCache() {
         this.ctx.fillStyle = this.style.captionStyle || "black";
         this.ctx.font = this.style.fontSize + "px Arial";
@@ -49,7 +52,7 @@ class Rel {
             const textCenterY = this.cache.curved.cy + this.cache.curved.r * Math.sin(centerAngle);
 
             let captionSpace = null;
-            if (this.properties.caption && !Number.isNaN(dist)) {
+            if (this.caption.text && !Number.isNaN(dist)) {
                 const [visibleCaption, captionWidth] = this.calcVisibleCaption(dist);
                 this.ctx.save();
                 this.ctx.translate(textCenterX, textCenterY);
@@ -119,7 +122,7 @@ class Rel {
             const y = this.cache.straight.start.y;
             const dy = this.cache.straight.end.y - y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (this.properties.caption) {
+            if (this.caption.text) {
                 const [visibleCaption, captionWidth] = this.calcVisibleCaption(dist);
                 if (!visibleCaption) {
                     return;
@@ -282,7 +285,7 @@ class Rel {
         this.ctx.restore();
     }
     calcVisibleCaption(dist) {
-        let caption = this.properties.caption;
+        let caption = this.caption.text;
         let dots = "";
         let metrics = { width: 0 };
 
