@@ -4,7 +4,10 @@
     import { onMount } from "svelte";
     import Rel from "../lib/viz/Rel.svelte";
     import Node from "../lib/viz/Node.svelte";
+    import Stroke from "../lib/viz/style/Stroke.svelte";
+    import Size from "../lib/viz/style/Size.svelte";
 
+    let selectedNode;
     let nodes = [];
     let relationships = [];
     onMount(() => {
@@ -16,9 +19,6 @@
                 properties: {
                     caption: "Product",
                 },
-                style: {
-                    radius: 40,
-                },
             },
             {
                 id: 2,
@@ -26,9 +26,6 @@
                 y: 274,
                 properties: {
                     caption: "Variant",
-                },
-                style: {
-                    radius: 40,
                 },
             },
             {
@@ -38,9 +35,6 @@
                 properties: {
                     caption: "Size",
                 },
-                style: {
-                    radius: 40,
-                },
             },
             {
                 id: 4,
@@ -48,9 +42,6 @@
                 y: 452,
                 properties: {
                     caption: "Color",
-                },
-                style: {
-                    radius: 40,
                 },
             },
         ];
@@ -61,8 +52,13 @@
         ];
     });
 
-    function nodeClicked(n) {
-        console.log(n);
+    function nodeClicked({ detail: { node } }) {
+        if (!selectedNode || selectedNode.id !== node.id) {
+            selectedNode = node;
+            // console.log("selectedNode: ", selectedNode);
+            return;
+        }
+        selectedNode = null;
     }
 </script>
 
@@ -71,7 +67,14 @@
         <div class="w-1/2">
             <Graph>
                 {#each nodes as node}
-                    <Node {...node} on:click={() => nodeClicked(node)} />
+                    <Node {...node} on:click={nodeClicked}>
+                        <Size radius={40} />
+                        {#if selectedNode && selectedNode.id === node.id}
+                            <Stroke color="orange" width={10} />
+                        {:else}
+                            <Stroke color="black" />
+                        {/if}
+                    </Node>
                 {/each}
                 {#each relationships as rel}
                     <Rel {...rel} />
@@ -81,12 +84,18 @@
         <div class="w-1/2">
             <Graph>
                 {#each nodes as node}
-                    <Node {...node} on:click={() => nodeClicked(node)} />
+                    <Node {...node}>
+                        <Stroke color="pink" />
+                        <Size radius={30} />
+                    </Node>
                 {/each}
                 {#each relationships as rel}
                     <Rel {...rel} />
                 {/each}
             </Graph>
         </div>
+        <!-- {#if selectedNode}
+            <button on:click={() => removeNode(selectedNode.id)}>Remove node</button>
+        {/if} -->
     </div>
 </Slide>

@@ -5,12 +5,16 @@
     import { numberOfSharedRels } from "./utils";
 
     setContext("graph", {
+        reportDirty,
         addNode,
+        removeNode,
         addRelationship,
     });
 
     export let w = 500;
     export let h = 450;
+
+    let dirty = false;
 
     const mouse = { offX: 0, offY: 0, dragging: false, down: false };
     let ctx, canvas, activeNode;
@@ -20,11 +24,19 @@
     let _nodes = [];
     let _rels = [];
 
+    function reportDirty() {
+        dirty = true;
+    }
+
     function addNode(n) {
         const nodeInstance = new NodeClass({ ...n, ctx });
         takenNodeIds.push(n.id);
         _nodes = _nodes.concat(nodeInstance);
         return nodeInstance;
+    }
+    function removeNode(id) {
+        _rels = _rels.filter((rel) => rel.fromId !== id && rel.toId !== id);
+        _nodes = _nodes.filter((n) => n.id !== id);
     }
 
     function addRelationship({ fromId, toId, style, properties }) {
@@ -54,10 +66,9 @@
         _rels = _rels.concat(rel);
         return rel;
     }
-    // function removeRelationship(id) {
-    //     const relInstance = _rels.find(rel => rel.id === id);
-    //     _rels = _rels.filter(rel => rel.id === id);
-    // }
+    function removeRelationship(id) {
+        _rels = _rels.filter((rel) => rel.id === id);
+    }
 
     onMount(() => {
         ctx = canvas.getContext("2d");
@@ -73,11 +84,9 @@
         canvas.addEventListener("mousemove", movingMouse);
         canvas.addEventListener("mousedown", downMouse);
         canvas.addEventListener("mouseup", upMouse);
-        // canvas.addEventListener("click", clickedMouse);
         draw();
         return () => {
             canvas.removeEventListener("mousemove", movingMouse);
-            // canvas.removeEventListener("click", clickedMouse);
             canvas.removeEventListener("mousedown", downMouse);
             canvas.removeEventListener("mouseup", upMouse);
         };
@@ -129,6 +138,12 @@
     }
     $: if ((_nodes || _rels) && ctx) {
         console.log("triggered to draw");
+        draw();
+    }
+
+    $: if (dirty) {
+        dirty = false;
+        console.log("dirty, drawing");
         draw();
     }
 </script>

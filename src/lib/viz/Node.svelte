@@ -1,5 +1,5 @@
 <script>
-    import { getContext, onMount, createEventDispatcher } from "svelte";
+    import { getContext, setContext, onMount, createEventDispatcher } from "svelte";
 
     export let id;
     export let x;
@@ -7,13 +7,29 @@
     export let properties;
     export let style;
 
+    let node = {};
+
+    const { addNode, reportDirty } = getContext("graph");
+
+    setContext("graph-node", {
+        updateStyle: (style) => {
+            if (node && node.updateStyle) {
+                node.updateStyle(style);
+            }
+        },
+        reportDirty,
+    });
+
     const dispatch = createEventDispatcher();
-    function onClick(n) {
-        dispatch("click", { n });
+    function onClick() {
+        dispatch("click", { node });
     }
-    const { addNode } = getContext("graph");
 
     onMount(() => {
-        addNode({ id, x, y, properties, style, onClick });
+        node = addNode({ id, x, y, properties, style, onClick });
     });
 </script>
+
+{#if node.id}
+    <slot />
+{/if}
