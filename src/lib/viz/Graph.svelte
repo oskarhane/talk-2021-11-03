@@ -151,4 +151,6 @@
 </script>
 
 <canvas bind:this={canvas} />
-<slot />
+{#if ctx}
+    <slot />
+{/if}

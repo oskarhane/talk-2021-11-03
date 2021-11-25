@@ -8,8 +8,8 @@ class Node {
         this.style = style;
         this.style.strokeWidth = 3;
         this.dragged = false;
-
         this.fontSize = 20;
+        this.baseFontSize = this.fontSize;
         this.updateRadius();
         this.onClick = onClick || function () {};
     }
@@ -20,9 +20,12 @@ class Node {
     }
     updateCaption(text) {
         this.caption.text = text;
+        this.calculateFontSize();
     }
     updateStyle(style) {
+        // console.log("this.style.radius: ", this.style.radius);
         const radius = Number(style.radius || this.style.radius);
+        // console.log("radius: ", radius);
         this.style = { ...this.style, ...style, radius };
         this.updateRadius();
     }
@@ -63,15 +66,15 @@ class Node {
     }
     calculateFontSize() {
         if (this.caption.text) {
-            this.ctx.font = this.fontSize + "px Arial";
-            const text = this.ctx.measureText(this.caption.text);
-            if (text.width > this.r * 2 - 10) {
-                this.fontSize--;
-                this.calculateFontSize();
-            } else if (text.width < this.r * 1.1) {
-                this.fontSize++;
-                this.calculateFontSize();
+            let width = Infinity;
+            let tmpFontSize = this.baseFontSize;
+            while (width > this.r * 2 - 10) {
+                this.ctx.font = tmpFontSize + "px Arial";
+                const text = this.ctx.measureText(this.caption.text);
+                width = text.width;
+                tmpFontSize--;
             }
+            this.fontSize = tmpFontSize;
         }
     }
 }

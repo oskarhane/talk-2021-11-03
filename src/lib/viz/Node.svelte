@@ -4,8 +4,6 @@
     export let id;
     export let x;
     export let y;
-    export let caption;
-    export let style;
 
     let node = {};
 
@@ -34,7 +32,7 @@
     }
 
     onMount(() => {
-        node = addNode({ id, x, y, caption, style, onClick });
+        node = addNode({ id, x, y, onClick });
     });
 </script>
 

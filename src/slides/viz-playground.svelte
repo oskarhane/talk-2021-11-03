@@ -46,6 +46,8 @@
             { fromId: 1, toId: 2, title: "HAS_VARIANTS" },
             { fromId: 2, toId: 3, title: "IS_SIZE" },
             { fromId: 2, toId: 4, title: "IS_COLOR" },
+            { fromId: 2, toId: 4, title: "IS_COLOR" },
+            { fromId: 2, toId: 4, title: "IS_COLOR" },
         ];
     });
 
@@ -83,6 +85,14 @@
         </div>
         <div class="w-1/2">
             <Graph>
+                <Node id={25} x={200} y={200}>
+                    <Size radius={30} />
+                    <Caption text="Hello 1" />
+                </Node>
+                <Node id={26} x={300} y={200}>
+                    <Caption text="Hello 2" />
+                    <Size radius={30} />
+                </Node>
                 {#each nodes as node}
                     <Node {...node}>
                         <Caption text={node.title} />
